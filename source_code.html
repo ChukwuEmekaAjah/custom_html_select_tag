@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Nav list</title>
+</head>
+<body>
+	<select name="select" id="selector" class="selector">
+		<option value="">Select car</option>
+		<option value="benz">Benz</option>
+		<option value="bmw">BMW</option>
+		<option value="toyota">Toyota</option>
+		<option value="kia">Kia</option>
+		<option value="hyundai">Hyundai</option>
+	</select>
+
+	<style type="text/css">
+		body{
+			background: red;
+		}
+		.select_container{
+			position: relative;
+			width:200px;
+			background: transparent;
+			color:white;
+			border:2px solid white;
+			box-sizing: border-box;
+			overflow: visible;
+			height: 40px;
+		}
+		.select_option, .selected_option{
+			width:200px;
+			box-sizing: border-box;
+			color:white;
+			border:1px solid white;
+			outline:none;
+			display: block;
+			border-radius: 0;
+			height: 40px;
+			text-align: center;
+			cursor: pointer;
+		}
+		.selected_option{
+			background: #000;
+		}
+		.selected_option_container{
+			background: transparent;
+			width:200px;
+			margin:0;
+			height: 40px;
+			padding:20px auto;
+			cursor: pointer;
+			text-align:center;
+			color:white;
+			outline: none;
+			border:1px solid white;
+		}
+		.select_options_container{
+			position:absolute;
+			background: #333;
+			top:40px;
+			left:0;
+			display: none;
+		}
+	</style>
+
+	<script type="text/javascript">
+		
+
+
+		// collecting the data from the original select boxes
+		var selectors = [].slice.call(document.querySelectorAll('.selector'));
+		// get options from each of them and print
+		selectors.forEach(function(selector){
+			// creating the containers for the select options 
+			var select_container = document.createElement('div');
+			select_container.classList.add('select_container');
+			select_container.dataset.visible = 'false';
+			var selected_option_container = document.createElement('div');
+			selected_option_container.classList.add('selected_option_container');
+			var select_options_container = document.createElement('div');
+			select_options_container.classList.add('select_options_container');
+			// append children to their parents
+			select_container.appendChild(selected_option_container);
+			select_container.appendChild(select_options_container);
+
+
+			// copying out options
+			var options = [].slice.call(selector.options);
+			var selected_option_placeholder = document.createElement('button');
+			selected_option_placeholder.dataset.value = options[0] ? options[0].value : ' ';
+			selected_option_placeholder.innerHTML = options[0] ? options[0].innerHTML : ' ';
+			selected_option_placeholder.classList.add('selected_option');
+			selected_option_placeholder.id = 'selected_option';
+			selected_option_container.appendChild(selected_option_placeholder);
+			options.forEach(function(option,index){
+				var select_option = document.createElement('button');
+				select_option.classList.add('select_option');
+				select_option.dataset.value = option.value;
+				select_option.innerHTML = option.innerHTML;
+				select_option.dataset.selected = index == 0 ? 'true' : 'false';
+				select_options_container.appendChild(select_option);
+			})
+			selector.parentElement.insertBefore(select_container,selector);
+			selector.style.display = 'none';
+			// for opening and closing the select options
+			selected_option_container.addEventListener('click',function(e){
+				var previously_selected_option = document.getElementById('selected_option');
+				selected_option_container.removeChild(previously_selected_option);
+				if(select_container.dataset.visible == 'false'){
+					select_options_container.style.display = 'block';
+					select_container.dataset.visible = 'true';
+				}
+				else{
+					select_options_container.style.display = 'none';
+					select_container.dataset.visible = 'false';
+				}
+			});
+			var select_options = [].slice.call(document.getElementsByClassName('select_option'));
+			select_options.forEach(function(select_option,index){
+				select_option.addEventListener('click',function(e){
+					// changing the selected index on the original select tag
+					var original_select = [].slice.call(document.querySelectorAll('.selector'));
+					original_select.forEach(function(select_tag){
+						select_tag.selectedIndex = index;
+					})
+					var other_options = [].slice.call(document.getElementsByClassName('select_option'));
+					other_options.forEach(function(option){
+						option.dataset.selected = 'false'
+						if(option.classList.contains("selected_option")){
+							option.classList.toggle("selected_option")
+						}
+					})
+					e.target.dataset.selected = 'true';
+					e.target.classList.toggle('selected_option')
+					var selected_option = document.createElement('button');
+					selected_option.dataset.value = e.target.dataset.value;
+					selected_option.innerHTML = e.target.innerHTML;
+					selected_option.classList.add('selected_option');
+					selected_option.id = "selected_option"
+					selected_option_container.appendChild(selected_option);
+					select_options_container.style.display = 'none';
+					select_container.dataset.visible = 'false';
+				})
+			})
+		})
+	</script>
+</body>
+</html>
