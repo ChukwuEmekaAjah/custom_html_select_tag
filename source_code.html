@@ -1,10 +1,19 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Nav list</title>
+	<title>Custom selector</title>
 </head>
 <body>
-	<select name="select" id="selector" class="selector">
+	<select name="select" class="selector">
+		<option value="">Select car</option>
+		<option value="benz">Benz</option>
+		<option value="bmw">BMW</option>
+		<option value="toyota">Toyota</option>
+		<option value="kia">Kia</option>
+		<option value="hyundai">Hyundai</option>
+	</select>
+
+	<select name="select" class="selector">
 		<option value="">Select car</option>
 		<option value="benz">Benz</option>
 		<option value="bmw">BMW</option>
@@ -71,12 +80,15 @@
 		var selectors = [].slice.call(document.querySelectorAll('.selector'));
 		// get options from each of them and print
 		selectors.forEach(function(selector){
-			// creating the containers for the select options 
+			// creating the containers for the select options
+			var selector_identifier = `selector_${Date.now().toString()}`;
+			selector.classList.add(selector_identifier) 
 			var select_container = document.createElement('div');
 			select_container.classList.add('select_container');
 			select_container.dataset.visible = 'false';
 			var selected_option_container = document.createElement('div');
 			selected_option_container.classList.add('selected_option_container');
+			selected_option_container.dataset.selector = selector_identifier;
 			var select_options_container = document.createElement('div');
 			select_options_container.classList.add('select_options_container');
 			// append children to their parents
@@ -88,6 +100,7 @@
 			var options = [].slice.call(selector.options);
 			var selected_option_placeholder = document.createElement('button');
 			selected_option_placeholder.dataset.value = options[0] ? options[0].value : ' ';
+			selected_option_container.dataset.selector = selector_identifier;
 			selected_option_placeholder.innerHTML = options[0] ? options[0].innerHTML : ' ';
 			selected_option_placeholder.classList.add('selected_option');
 			selected_option_placeholder.id = 'selected_option';
@@ -96,6 +109,7 @@
 				var select_option = document.createElement('button');
 				select_option.classList.add('select_option');
 				select_option.dataset.value = option.value;
+				select_option.dataset.selector = selector_identifier;
 				select_option.innerHTML = option.innerHTML;
 				select_option.dataset.selected = index == 0 ? 'true' : 'false';
 				select_options_container.appendChild(select_option);
@@ -104,7 +118,7 @@
 			selector.style.display = 'none';
 			// for opening and closing the select options
 			selected_option_container.addEventListener('click',function(e){
-				var previously_selected_option = document.getElementById('selected_option');
+				var previously_selected_option = document.querySelector(`div[data-selector="${selector_identifier}"] button.selected_option`);
 				selected_option_container.removeChild(previously_selected_option);
 				if(select_container.dataset.visible == 'false'){
 					select_options_container.style.display = 'block';
@@ -115,15 +129,14 @@
 					select_container.dataset.visible = 'false';
 				}
 			});
-			var select_options = [].slice.call(document.getElementsByClassName('select_option'));
+			var select_options = [].slice.call(document.querySelectorAll(`button[data-selector="${selector_identifier}"`));
 			select_options.forEach(function(select_option,index){
 				select_option.addEventListener('click',function(e){
+					// the possibility of multiple select here.
 					// changing the selected index on the original select tag
-					var original_select = [].slice.call(document.querySelectorAll('.selector'));
-					original_select.forEach(function(select_tag){
-						select_tag.selectedIndex = index;
-					})
-					var other_options = [].slice.call(document.getElementsByClassName('select_option'));
+					var original_select = [].slice.call(document.querySelector(`.${selector_identifier}`));
+					original_select.selectedIndex = index;
+					var other_options = [].slice.call(document.querySelectorAll(`button[data-selector="${selector_identifier}`));
 					other_options.forEach(function(option){
 						option.dataset.selected = 'false'
 						if(option.classList.contains("selected_option")){
@@ -134,6 +147,7 @@
 					e.target.classList.toggle('selected_option')
 					var selected_option = document.createElement('button');
 					selected_option.dataset.value = e.target.dataset.value;
+					selected_option.dataset.selector = selector_identifier;
 					selected_option.innerHTML = e.target.innerHTML;
 					selected_option.classList.add('selected_option');
 					selected_option.id = "selected_option"
